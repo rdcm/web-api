@@ -9,7 +9,7 @@ pub mod contracts_module {
     pub struct UserResponse {
         pub name: String,
         pub age: u8,
-        pub id: u8,
+        pub id: u32,
     }
 
     #[derive(Serialize)]

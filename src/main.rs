@@ -6,14 +6,12 @@ use contracts::contracts_module::{UserIdResponse};
 
 use actix_web::web::Json;
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder, Result, http};
-use crate::http::StatusCode;
 
 #[macro_use] extern crate serde_derive;
 
-#[get("/user/get")]
-async fn get() -> Result<Json<UserResponse>> {
-
-    let user_id = 1;
+#[get("/user/{user_id}")]
+async fn get(web::Path(user_id) : web::Path<u32>) -> Result<Json<UserResponse>> {
+    
     let response = UserResponse {
         name: String::from("someusername123"),
         age: 20,
@@ -23,7 +21,7 @@ async fn get() -> Result<Json<UserResponse>> {
     Ok(Json(response))
 }
 
-#[post("/user/create")]
+#[post("/user")]
 async fn create(user: Json<CreateUserRequest>) -> Result<Json<UserIdResponse>> {
 
     let response = UserIdResponse {
