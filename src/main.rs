@@ -1,40 +1,65 @@
 mod contracts;
+mod user;
+mod dal;
 
-use contracts::contracts_module::{UserResponse};
-use contracts::contracts_module::{CreateUserRequest};
-use contracts::contracts_module::{UserIdResponse};
+use user::user_module::*;
+use contracts::contracts_module::*;
+use dal::dal_module::*;
 
 use actix_web::web::Json;
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder, Result, http};
+use mongodb::{bson::doc, options::IndexOptions, Client, Collection, IndexModel};
 
 #[macro_use] extern crate serde_derive;
 
 #[get("/user/{user_id}")]
-async fn get(web::Path(user_id) : web::Path<u32>) -> Result<Json<UserResponse>> {
-    
-    let response = UserResponse {
-        name: String::from("someusername123"),
-        age: 20,
-        id: user_id,
-    };
+async fn get(
+    user_repo: web::Data<UserRepository>,
+    user_id: web::Path<String>) -> HttpResponse {
 
-    Ok(Json(response))
+
+    let option = user_repo.get(user_id.to_string()).await;
+
+    match option {
+        Some(user) => HttpResponse::Ok().json(user),
+        None => HttpResponse::NotFound()
+            .body(format!("No user found with id {}", user_id)),   
+    }
+    
 }
 
 #[post("/user")]
-async fn create(user: Json<CreateUserRequest>) -> Result<Json<UserIdResponse>> {
-
-    let response = UserIdResponse {
-        id: 1
-    };
-
-    Ok(Json(response))
+async fn create(
+    user_repo: web::Data<UserRepository>,
+    user: Json<CreateUserRequest>) -> HttpResponse {
+        let user = User {
+            name: user.name.to_string(),
+            age: user.age,
+        };
+    
+        let result = user_repo.create(user).await;
+    
+        match result {
+            Ok(_) => HttpResponse::Ok().body("user added"),
+            Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
+        }
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
+    let uri = std::env::var("MONGODB_URI")
+        .unwrap_or_else(|_| "mongodb://localhost:27017".into());
+
+    let client = Client::with_uri_str(uri).await.expect("failed connect to db");
+    let collection: Collection<User> = client.database("rust_app").collection("users");
+
+    let user_repo  = UserRepository {
+        coll: collection,
+    };
+    
+    HttpServer::new(move || {
         App::new()
+            .app_data(web::Data::new(user_repo.clone()))
             .service(get)
             .service(create)
     })
