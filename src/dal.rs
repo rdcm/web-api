@@ -1,6 +1,6 @@
 pub mod dal_module {
     use crate::{IUserRepository, User};
-    use mongodb::{bson, bson::doc, options::IndexOptions, Client, Collection, IndexModel};
+    use mongodb::{bson, bson::doc, Collection };
     use async_trait::async_trait;
 
     #[derive(Debug, Clone)]

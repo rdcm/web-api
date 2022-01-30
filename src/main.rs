@@ -7,8 +7,8 @@ use contracts::contracts_module::*;
 use dal::dal_module::*;
 
 use actix_web::web::Json;
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder, Result, http};
-use mongodb::{bson::doc, options::IndexOptions, Client, Collection, IndexModel};
+use actix_web::{get, post, web, App, HttpResponse, HttpServer};
+use mongodb::{Client, Collection};
 
 #[macro_use] extern crate serde_derive;
 
