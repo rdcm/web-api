@@ -53,9 +53,7 @@ async fn main() -> std::io::Result<()> {
     let client = Client::with_uri_str(uri).await.expect("failed connect to db");
     let collection: Collection<User> = client.database("rust_app").collection("users");
 
-    let user_repo  = UserRepository {
-        coll: collection,
-    };
+    let user_repo  = UserRepository::new(collection);
     
     HttpServer::new(move || {
         App::new()
