@@ -2,22 +2,22 @@ mod contracts;
 mod user;
 mod dal;
 
+use std::sync::Arc;
 use user::user_module::*;
 use contracts::contracts_module::*;
 use dal::dal_module::*;
 
-use actix_web::web::Json;
+use actix_web::web::{Data, Json};
 use actix_web::{get, post, web, App, HttpResponse, HttpServer};
+use actix_web::dev::Server;
 use mongodb::{Client, Collection};
 
 #[macro_use] extern crate serde_derive;
 
-#[get("/user/{user_id}")]
-async fn get(
-    user_repo: web::Data<UserRepository>,
+async fn get<T: IUserRepository>(
+    user_repo: web::Data<T>,
     user_id: web::Path<String>) -> HttpResponse {
-
-
+    
     let option = user_repo.get(user_id.to_string()).await;
 
     match option {
@@ -28,9 +28,8 @@ async fn get(
     
 }
 
-#[post("/user")]
-async fn create(
-    user_repo: web::Data<UserRepository>,
+async fn create<T: IUserRepository>(
+    user_repo: web::Data<T>,
     user: Json<CreateUserRequest>) -> HttpResponse {
         let user = User {
             name: user.name.to_string(),
@@ -52,16 +51,20 @@ async fn main() -> std::io::Result<()> {
 
     let client = Client::with_uri_str(uri).await.expect("failed connect to db");
     let collection: Collection<User> = client.database("rust_app").collection("users");
-
     let user_repo  = UserRepository::new(collection);
-    
-    HttpServer::new(move || {
+
+    return create_server(user_repo).unwrap().await;
+}
+
+pub fn create_server<T: IUserRepository + Send + Sync + 'static + Clone>(user_repo: T) -> Result<Server, std::io::Error> {
+    let server = HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(user_repo.clone()))
-            .service(get)
-            .service(create)
+            .route("/user/{user_id}", web::get().to(get::<T>))
+            .route("/user", web::post().to(create::<T>))
     })
     .bind("127.0.0.1:8080")?
-    .run()
-    .await
+    .run();
+
+    Ok(server)
 }
