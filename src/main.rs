@@ -38,7 +38,7 @@ async fn create<T: IUserRepository>(
         let result = user_repo.create(user).await;
     
         match result {
-            Ok(_) => HttpResponse::Ok().body(result.unwrap().as_str()),
+            Ok(_) => HttpResponse::Ok().body(result.unwrap()),
             Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
         }
 }
