@@ -27,12 +27,8 @@ pub mod dal_module {
         }
 
         async fn get(&self, id: String) -> Option<User> {
-            let result = self.collection.find_one(doc! { "_id": bson::oid::ObjectId::parse_str(&id).unwrap() }, None).await;
-
-            return match result {
-                Ok(find_result) => find_result,
-                Err(err) => Option::None
-            };
+            let user_id = bson::oid::ObjectId::parse_str(&id).ok()?;
+            return self.collection.find_one(doc! { "_id": user_id }, None).await.ok()?;
         }
     }
 }

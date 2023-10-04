@@ -2,13 +2,12 @@ mod contracts;
 mod user;
 mod dal;
 
-use std::sync::Arc;
 use user::user_module::*;
 use contracts::contracts_module::*;
 use dal::dal_module::*;
 
-use actix_web::web::{Data, Json};
-use actix_web::{get, post, web, App, HttpResponse, HttpServer};
+use actix_web::web::{Json};
+use actix_web::{web, App, HttpResponse, HttpServer};
 use actix_web::dev::Server;
 use mongodb::{Client, Collection};
 
@@ -39,7 +38,7 @@ async fn create<T: IUserRepository>(
         let result = user_repo.create(user).await;
     
         match result {
-            Ok(_) => HttpResponse::Ok().body("user added"),
+            Ok(_) => HttpResponse::Ok().body(result.unwrap().as_str()),
             Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
         }
 }
