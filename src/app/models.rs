@@ -3,7 +3,7 @@ use serde_derive::{Deserialize, Serialize};
 #[derive(Deserialize)]
 pub struct CreateUserRequest {
     pub name: String,
-    pub age: u8
+    pub age: u8,
 }
 
 #[derive(Serialize)]

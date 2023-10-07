@@ -12,21 +12,18 @@ impl Sut {
 
         rt::spawn(info.server);
 
-        Self {
-            base_url,
-        }
+        Self { base_url }
     }
 
     pub async fn get_user(&self, id: String) -> String {
         let uri = format!("{}/user/{}", self.base_url, id);
-        let response =  reqwest::get(uri).await;
+        let response = reqwest::get(uri).await;
 
         match response {
             Ok(r) => r.status().to_string(),
-            Err(e) => e.to_string()
+            Err(e) => e.to_string(),
         }
     }
 
-    pub fn create_user(&self, name: String, age: u8) {
-    }
+    pub fn create_user(&self, name: String, age: u8) {}
 }

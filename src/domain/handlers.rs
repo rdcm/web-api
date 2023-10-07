@@ -1,8 +1,8 @@
-use std::sync::Arc;
-use async_trait::async_trait;
 use crate::contracts::commands::{CreateUserCommand, ICommandHandler};
 use crate::contracts::queries::{GetUserQuery, IQueryHandler, User};
-use crate::domain::ports::{IUserRepository};
+use crate::domain::ports::IUserRepository;
+use async_trait::async_trait;
+use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct CreateUserCommandHandler {

@@ -1,6 +1,6 @@
 use uuid::Uuid;
 
-pub struct Gen { }
+pub struct Gen {}
 
 impl Gen {
     pub fn random_string() -> String {
