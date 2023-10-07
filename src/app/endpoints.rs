@@ -18,7 +18,7 @@ pub async fn get_user(
     match option {
         Some(user) => HttpResponse::Ok().json(user),
         None => {
-            HttpResponse::NotFound().body(format!("No user found with id {}", path.to_string()))
+            HttpResponse::NotFound().body(format!("No user found with id {}", path))
         }
     }
 }
@@ -36,6 +36,6 @@ pub async fn create_user(
 
     match option {
         Some(id) => HttpResponse::Ok().body(id),
-        None => HttpResponse::BadRequest().body({}),
+        None => HttpResponse::BadRequest().body(()),
     }
 }

@@ -52,5 +52,5 @@ async fn create_user_repository() -> UserRepository {
         .await
         .expect("failed connect to db");
     let collection: Collection<User> = client.database(&db_name).collection("users");
-    return UserRepository::new(collection);
+    UserRepository::new(collection)
 }

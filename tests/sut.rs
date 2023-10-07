@@ -24,6 +24,4 @@ impl Sut {
             Err(e) => e.to_string(),
         }
     }
-
-    pub fn create_user(&self, name: String, age: u8) {}
 }
