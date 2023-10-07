@@ -1,3 +1,4 @@
+use std::net::SocketAddr;
 use std::sync::Arc;
 use actix_web::{App, HttpServer};
 use actix_web::dev::Server;
@@ -10,8 +11,12 @@ use crate::contracts::queries::{GetUserQuery, IQueryHandler, User};
 use crate::domain::handlers::{CreateUserCommandHandler, GetUserQueryHandler};
 use crate::infra::repositories::UserRepository;
 
-pub async fn create_server() -> Result<Server, std::io::Error> {
+pub struct ServerInfo {
+    pub server: Server,
+    pub addrs: Vec<SocketAddr>
+}
 
+pub async fn create_server(port: i32) -> Result<ServerInfo, std::io::Error> {
     let user_repository = create_user_repository().await;
     let command_handler: Arc<dyn ICommandHandler<CreateUserCommand, Option<String>>> = Arc::new(CreateUserCommandHandler {
         repo: Arc::new(user_repository.clone()),
@@ -20,7 +25,7 @@ pub async fn create_server() -> Result<Server, std::io::Error> {
         repo: Arc::new(user_repository.clone()),
     });
 
-    let server = HttpServer::new(move || {
+    let http_server = HttpServer::new(move || {
         App::new()
             .app_data(Data::from(command_handler.clone()))
             .app_data(Data::from(query_handler.clone()))
@@ -28,11 +33,16 @@ pub async fn create_server() -> Result<Server, std::io::Error> {
             .route("/user", post().to(create_user))
 
     })
-    .bind(("127.0.0.1", 8080))
-    .expect("Failed to bind to the server.")
-    .run();
+    .bind(format!("127.0.0.1:{}", port))
+    .expect("Failed to bind to the server.");
 
-    Ok(server)
+    let addrs = http_server.addrs();
+    let server = http_server.run();
+
+    Ok(ServerInfo {
+        server,
+        addrs
+    })
 }
 
 async fn create_user_repository() -> UserRepository {

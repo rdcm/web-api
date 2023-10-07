@@ -10,5 +10,5 @@ use crate::root::composition_root::create_server;
 async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "debug");
     env_logger::init();
-    return create_server().await.unwrap().await;
+    return create_server(8080).await.unwrap().server.await;
 }
