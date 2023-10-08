@@ -4,7 +4,6 @@ use crate::domain::ports::IUserRepository;
 use async_trait::async_trait;
 use std::sync::Arc;
 
-#[derive(Clone)]
 pub struct CreateUserCommandHandler {
     pub repo: Arc<dyn IUserRepository>,
 }
@@ -21,7 +20,6 @@ impl ICommandHandler<CreateUserCommand, Option<String>> for CreateUserCommandHan
     }
 }
 
-#[derive(Clone)]
 pub struct GetUserQueryHandler {
     pub repo: Arc<dyn IUserRepository>,
 }

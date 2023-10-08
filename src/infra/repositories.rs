@@ -19,8 +19,15 @@ impl UserRepository {
 impl IUserRepository for UserRepository {
     async fn create(&self, user: User) -> Option<String> {
         let result = self.collection.insert_one(user, None).await;
+
         return match result {
-            Ok(insertion_result) => Some(insertion_result.inserted_id.to_string()),
+            Ok(insertion_result) => Some(
+                insertion_result
+                    .inserted_id
+                    .as_object_id()
+                    .unwrap()
+                    .to_string(),
+            ),
             Err(_) => None,
         };
     }

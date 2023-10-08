@@ -1,8 +1,8 @@
 ## About
 
-Web api application prototype written in rust.
+Web api application prototype written in rust
 
-## Features:
+## Features
 
 - Clean architecture design with CQRS pattern
 - Crud api endpoints with actix-web and mongodb driver
