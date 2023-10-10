@@ -1,3 +1,6 @@
+mod gen;
+mod sut;
+
 use crate::gen::Gen;
 use crate::sut::Sut;
 

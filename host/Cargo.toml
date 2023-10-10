@@ -1,0 +1,17 @@
+[package]
+name = "host"
+version = "0.0.1"
+edition = "2021"
+
+[dependencies]
+actix-web = "4.4.0"
+env_logger = "0.10.0"
+mongodb = "2.7.0"
+serde = "1.0.188"
+serde_derive = "1.0.188"
+async-trait = "0.1.73"
+
+app = { path = "../app" }
+domain = { path = "../domain" }
+domain_impl = { path = "../domain_impl" }
+infra = { path = "../infra" }

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-rustc ./src/main.rs
+rustc ./host/src/main.rs

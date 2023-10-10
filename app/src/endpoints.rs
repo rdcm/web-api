@@ -1,9 +1,8 @@
+use crate::models::{CreateUserRequest, CreatedUserIdResponse, UserResponse};
 use actix_web::web::{Data, Json, Path};
 use actix_web::HttpResponse;
-
-use crate::app::models::{CreateUserRequest, CreatedUserIdResponse, UserResponse};
-use crate::contracts::commands::{CreateUserCommand, ICommandHandler};
-use crate::contracts::queries::{GetUserQuery, IQueryHandler, User};
+use domain::commands::{CreateUserCommand, ICommandHandler};
+use domain::queries::{GetUserQuery, IQueryHandler, User};
 
 pub async fn get_user(
     handler: Data<dyn IQueryHandler<GetUserQuery, Option<User>>>,

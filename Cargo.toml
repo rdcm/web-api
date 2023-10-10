@@ -1,19 +1,13 @@
-[package]
-name = "web-api"
-version = "0.0.1"
-edition = "2021"
+[workspace]
+resolver = "2"
+members = [
+    "app",
+    "domain",
+    "domain_impl",
+    "host",
+    "infra",
+    "integrtion-tests",
+]
 
-[dependencies]
-actix-web = "4.4.0"
-env_logger = "0.10.0"
-mongodb = "2.7.0"
-serde = "1.0.188"
-serde_derive = "1.0.188"
+[workspace.dependencies]
 async-trait = "0.1.73"
-
-[dev-dependencies]
-rand = "0.8.5"
-actix-rt = "2.8.0"
-uuid = { version = "1.4.1", features = ["serde", "v4"] }
-reqwest = { version = "0.11", features = ["json"] }
-tokio = { version = "1", features = ["full"] }

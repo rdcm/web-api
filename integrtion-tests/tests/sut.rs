@@ -1,7 +1,7 @@
 use actix_web::rt;
+use app::models::{CreateUserRequest, CreatedUserIdResponse, UserResponse};
+use host::factory::create_server;
 use reqwest::StatusCode;
-use web_api::app::models::{CreateUserRequest, CreatedUserIdResponse, UserResponse};
-use web_api::root::composition_root::create_server;
 
 #[derive(Clone)]
 pub struct Sut {

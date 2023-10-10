@@ -1,0 +1,23 @@
+[package]
+name = "tests"
+version = "0.0.1"
+edition = "2021"
+
+[dependencies]
+app = { path = "../app" }
+domain = { path = "../domain" }
+domain_impl = { path = "../domain_impl" }
+infra = { path = "../infra" }
+host = { path = "../host" }
+
+rand = "0.8.5"
+uuid = { version = "1.4.1", features = ["serde", "v4"] }
+actix-web = "4.4.0"
+actix-rt = "2.8.0"
+reqwest = { version = "0.11", features = ["json"] }
+tokio = { version = "1", features = ["full"] }
+
+
+[[test]]
+name = "user_tests"
+path = "tests/user_tests.rs"

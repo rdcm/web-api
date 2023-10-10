@@ -1,10 +1,4 @@
-mod app;
-mod contracts;
-mod domain;
-mod infra;
-mod root;
-
-use crate::root::composition_root::create_server;
+use host::factory::create_server;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

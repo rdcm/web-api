@@ -5,11 +5,11 @@ use mongodb::{Client, Collection};
 use std::net::SocketAddr;
 use std::sync::Arc;
 
-use crate::app::endpoints::{create_user, get_user};
-use crate::contracts::commands::{CreateUserCommand, ICommandHandler};
-use crate::contracts::queries::{GetUserQuery, IQueryHandler, User};
-use crate::domain::handlers::{CreateUserCommandHandler, GetUserQueryHandler};
-use crate::infra::repositories::UserRepository;
+use app::endpoints::{create_user, get_user};
+use domain::commands::{CreateUserCommand, ICommandHandler};
+use domain::queries::{GetUserQuery, IQueryHandler, User};
+use domain_impl::handlers::{CreateUserCommandHandler, GetUserQueryHandler};
+use infra::repositories::UserRepository;
 
 pub struct ServerInfo {
     pub server: Server,

@@ -1,8 +1,8 @@
 use async_trait::async_trait;
 use mongodb::{bson, bson::doc, Collection};
 
-use crate::contracts::queries::User;
-use crate::domain::ports::IUserRepository;
+use domain::queries::User;
+use domain_impl::ports::IUserRepository;
 
 #[derive(Debug, Clone)]
 pub struct UserRepository {

@@ -1,0 +1,8 @@
+[package]
+name = "domain_impl"
+version = "0.0.1"
+edition = "2021"
+
+[dependencies]
+async-trait = "0.1.73"
+domain = { path = "../domain" }
