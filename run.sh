@@ -1,3 +1,3 @@
-#!/bin/sh
+#!/bin/bash
 
-rustc ./host/src/main.rs
+./target/debug/host
