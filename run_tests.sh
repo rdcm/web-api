@@ -4,11 +4,12 @@
 cargo install grcov
 rustup component add llvm-tools-preview
 
-#timestamp
-directory_name="$(date '+%Y-%m-%d_%H-%M-%S')"
+# create coverage directory
+timestamp="$(date '+%Y-%m-%d_%H-%M-%S')"
+directory_path="target/coverage/${timestamp}"
 
 # build
-export LLVM_PROFILE_FILE="target/coverage/${directory_name}/%p-%m.profraw"
+export LLVM_PROFILE_FILE="${directory_path}/%p-%m.profraw"
 export RUSTFLAGS="-Cinstrument-coverage"
 cargo build --workspace
 
@@ -16,10 +17,10 @@ cargo build --workspace
 cargo test --workspace
 
 # move all *.profraw
-find . -name '*.profraw' -exec mv {} "./target/coverage/${directory_name}" \;
+find . -path "*/${timestamp}/*" -name '*.profraw' -exec mv {} "./${directory_path}" \;
 
 # generate report
-grcov target/coverage --binary-path target/debug -s . -o "target/coverage/${directory_name}" --ignore "target/debug/*" --ignore "integrtion-tests/*" --output-types html,cobertura
+grcov "target/coverage/${timestamp}" --binary-path target/debug -s . -o "${directory_path}" --ignore "target/debug/*" --ignore "integrtion-tests/*" --output-types html
 
-#open report
-open "./target/coverage/${directory_name}/html/index.html"
+# open report
+open "./${directory_path}/html/index.html"
