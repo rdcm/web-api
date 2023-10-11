@@ -17,14 +17,15 @@ pub struct ServerInfo {
 }
 
 pub async fn create_server(port: i32) -> Result<ServerInfo, std::io::Error> {
-    let user_repository = create_user_repository().await;
+    let user_repository_arc = Arc::new(create_user_repository().await);
+
     let command_handler: Arc<dyn ICommandHandler<CreateUserCommand, Option<String>>> =
         Arc::new(CreateUserCommandHandler {
-            repo: Arc::new(user_repository.clone()),
+            repo: user_repository_arc.clone(),
         });
     let query_handler: Arc<dyn IQueryHandler<GetUserQuery, Option<User>>> =
         Arc::new(GetUserQueryHandler {
-            repo: Arc::new(user_repository.clone()),
+            repo: user_repository_arc.clone(),
         });
 
     let http_server = HttpServer::new(move || {
