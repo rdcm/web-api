@@ -8,6 +8,7 @@ Web api application prototype written in rust
 - Crud api endpoints with actix-web and mongodb driver
 - Integration tests
 - Workspaces usage
+- OpenApi and Swagger-UI
 - Code coverage report
 - Static analysis report
 

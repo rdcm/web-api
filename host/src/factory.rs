@@ -1,15 +1,28 @@
 use actix_web::dev::Server;
-use actix_web::web::{get, post, Data};
+use actix_web::web::Data;
 use actix_web::{App, HttpServer};
 use mongodb::{Client, Collection};
 use std::net::SocketAddr;
 use std::sync::Arc;
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
 
 use app::endpoints::{create_user, get_user};
+use app::models::*;
 use domain::commands::{CreateUserCommand, ICommandHandler};
 use domain::queries::{GetUserQuery, IQueryHandler, User};
 use domain_impl::handlers::{CreateUserCommandHandler, GetUserQueryHandler};
 use infra::repositories::UserRepository;
+
+#[derive(OpenApi)]
+#[openapi(
+    paths(app::endpoints::create_user, app::endpoints::get_user),
+    components(
+        schemas(CreateUserRequest, CreatedUserIdResponse, ErrorResponse),
+        schemas(UserResponse, ErrorResponse)
+    )
+)]
+struct ApiDoc;
 
 pub struct ServerInfo {
     pub server: Server,
@@ -18,7 +31,6 @@ pub struct ServerInfo {
 
 pub async fn create_server(port: i32) -> Result<ServerInfo, std::io::Error> {
     let user_repository_arc = Arc::new(create_user_repository().await);
-
     let command_handler: Arc<dyn ICommandHandler<CreateUserCommand, Option<String>>> =
         Arc::new(CreateUserCommandHandler {
             repo: user_repository_arc.clone(),
@@ -28,12 +40,17 @@ pub async fn create_server(port: i32) -> Result<ServerInfo, std::io::Error> {
             repo: user_repository_arc.clone(),
         });
 
+    let openapi = ApiDoc::openapi();
+
     let http_server = HttpServer::new(move || {
         App::new()
+            .service(
+                SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-docs/openapi.json", openapi.clone()),
+            )
+            .service(create_user)
+            .service(get_user)
             .app_data(Data::from(command_handler.clone()))
             .app_data(Data::from(query_handler.clone()))
-            .route("/user/{user_id}", get().to(get_user))
-            .route("/user", post().to(create_user))
     })
     .bind(format!("127.0.0.1:{}", port))
     .expect("Failed to bind to the server.");

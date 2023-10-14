@@ -1,9 +1,21 @@
-use crate::models::{CreateUserRequest, CreatedUserIdResponse, UserResponse};
+use crate::models::{CreateUserRequest, CreatedUserIdResponse, ErrorResponse, UserResponse};
 use actix_web::web::{Data, Json, Path};
-use actix_web::HttpResponse;
+use actix_web::{get, post, HttpResponse};
 use domain::commands::{CreateUserCommand, ICommandHandler};
 use domain::queries::{GetUserQuery, IQueryHandler, User};
 
+/// Get user
+///
+/// Get user by id
+#[utoipa::path(
+    get,
+    path = "/user/{user_id}",
+    responses(
+        (status = 200, description = "User created successfully", body = UserResponse),
+        (status = 400, description = "Something going wrong", body = ErrorResponse)
+    )
+)]
+#[get("/user/{user_id}")]
 pub async fn get_user(
     handler: Data<dyn IQueryHandler<GetUserQuery, Option<User>>>,
     path: Path<String>,
@@ -20,10 +32,21 @@ pub async fn get_user(
             age: user.age,
             id: path.to_string(),
         }),
-        None => HttpResponse::NotFound().body(format!("No user found with id {}", path)),
+        None => HttpResponse::BadRequest().json(ErrorResponse { code: 101 }),
     }
 }
 
+/// Create user
+///
+/// Create user
+#[utoipa::path(
+    request_body = CreateUserRequest,
+    responses(
+        (status = 201, description = "User created successfully", body = CreatedUserIdResponse),
+        (status = 400, description = "Something going wrong", body = ErrorResponse)
+    )
+)]
+#[post("/user")]
 pub async fn create_user(
     handler: Data<dyn ICommandHandler<CreateUserCommand, Option<String>>>,
     request: Json<CreateUserRequest>,
@@ -36,7 +59,7 @@ pub async fn create_user(
     let option = handler.handle(command).await;
 
     match option {
-        Some(id) => HttpResponse::Ok().json(CreatedUserIdResponse { id }),
-        None => HttpResponse::BadRequest().body(()),
+        Some(id) => HttpResponse::Created().json(CreatedUserIdResponse { id }),
+        None => HttpResponse::BadRequest().json(ErrorResponse { code: 102 }),
     }
 }

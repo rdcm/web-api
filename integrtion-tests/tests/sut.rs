@@ -44,7 +44,7 @@ impl Sut {
             .await
             .unwrap();
 
-        if response.status() == StatusCode::OK {
+        if response.status() == StatusCode::CREATED {
             let user: CreatedUserIdResponse = response.json().await.unwrap();
 
             Ok(user)
