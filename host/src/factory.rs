@@ -1,12 +1,14 @@
 use actix_web::dev::Server;
 use actix_web::web::Data;
 use actix_web::{App, HttpServer};
+use mongodb::options::{ClientOptions, ServerApi, ServerApiVersion};
 use mongodb::{Client, Collection};
 use std::net::SocketAddr;
 use std::sync::Arc;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
+use crate::conf::AppConf;
 use app::endpoints::{create_user, get_user};
 use app::models::*;
 use domain::commands::{CreateUserCommand, ICommandHandler};
@@ -29,8 +31,8 @@ pub struct ServerInfo {
     pub addrs: Vec<SocketAddr>,
 }
 
-pub async fn create_server(port: i32) -> Result<ServerInfo, std::io::Error> {
-    let user_repository_arc = Arc::new(create_user_repository().await);
+pub async fn create_server(conf: &AppConf) -> Result<ServerInfo, std::io::Error> {
+    let user_repository_arc = Arc::new(create_user_repository(conf).await);
     let command_handler: Arc<dyn ICommandHandler<CreateUserCommand, Option<String>>> =
         Arc::new(CreateUserCommandHandler {
             repo: user_repository_arc.clone(),
@@ -42,6 +44,7 @@ pub async fn create_server(port: i32) -> Result<ServerInfo, std::io::Error> {
 
     let openapi = ApiDoc::openapi();
 
+    let addr = conf.get_api_address();
     let http_server = HttpServer::new(move || {
         App::new()
             .service(
@@ -52,8 +55,8 @@ pub async fn create_server(port: i32) -> Result<ServerInfo, std::io::Error> {
             .app_data(Data::from(command_handler.clone()))
             .app_data(Data::from(query_handler.clone()))
     })
-    .bind(format!("127.0.0.1:{}", port))
-    .expect("Failed to bind to the server.");
+    .bind(&addr)
+    .unwrap_or_else(|_| panic!("Failed to bind to the host: {}", &addr));
 
     let addrs = http_server.addrs();
     let server = http_server.run();
@@ -61,14 +64,14 @@ pub async fn create_server(port: i32) -> Result<ServerInfo, std::io::Error> {
     Ok(ServerInfo { server, addrs })
 }
 
-async fn create_user_repository() -> UserRepository {
-    let uri = std::env::var("MONGODB_URI").unwrap_or_else(|_| "mongodb://localhost:27017".into());
+async fn create_user_repository(conf: &AppConf) -> UserRepository {
+    let mut client_options = ClientOptions::parse(&conf.connection_string).await.unwrap();
 
-    let db_name = std::env::var("MONGODB_DBNAME").unwrap_or_else(|_| "rust_app".into());
+    let server_api = ServerApi::builder().version(ServerApiVersion::V1).build();
+    client_options.server_api = Some(server_api);
 
-    let client = Client::with_uri_str(uri)
-        .await
-        .expect("failed connect to db");
-    let collection: Collection<User> = client.database(&db_name).collection("users");
+    let client = Client::with_options(client_options).unwrap();
+
+    let collection: Collection<User> = client.database("asd").collection("users");
     UserRepository::new(collection)
 }

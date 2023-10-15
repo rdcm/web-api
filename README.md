@@ -9,6 +9,7 @@ Web api application prototype written in rust
 - Integration tests
 - Workspaces usage
 - OpenApi and Swagger-UI
+- Multi-stage docker build
 - Code coverage report
 - Static analysis report
 

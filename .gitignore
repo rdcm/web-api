@@ -4,5 +4,4 @@
 debug/
 target/
 
-Cargo.lock
 *.profraw

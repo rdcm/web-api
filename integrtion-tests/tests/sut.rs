@@ -1,5 +1,6 @@
 use actix_web::rt;
 use app::models::{CreateUserRequest, CreatedUserIdResponse, UserResponse};
+use host::conf::AppConf;
 use host::factory::create_server;
 use reqwest::StatusCode;
 
@@ -10,8 +11,14 @@ pub struct Sut {
 
 impl Sut {
     pub async fn new() -> Sut {
-        let info = create_server(0).await.unwrap();
-        let base_url = format!("http://localhost:{}", info.addrs[0].port());
+        let conf = AppConf {
+            api_host: "127.0.0.1".to_string(),
+            api_port: 0,
+            connection_string: "mongodb://127.0.0.1/test".to_string(),
+        };
+
+        let info = create_server(&conf).await.unwrap();
+        let base_url = format!("http://{}:{}", info.addrs[0].ip(), info.addrs[0].port());
 
         rt::spawn(info.server);
 
@@ -29,7 +36,7 @@ impl Sut {
 
             Ok(user)
         } else {
-            Err("error".to_string())
+            Err(response.text().await.unwrap())
         }
     }
 
@@ -49,7 +56,7 @@ impl Sut {
 
             Ok(user)
         } else {
-            Err("error".to_string())
+            Err(response.text().await.unwrap())
         }
     }
 }

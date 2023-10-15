@@ -4,15 +4,14 @@
 cargo install grcov
 rustup component add llvm-tools-preview
 
-# create coverage directory
+# set coverage directory path
 timestamp="$(date '+%Y-%m-%d_%H-%M-%S')"
 directory_path="target/coverage/${timestamp}"
 
-# build
+# set compiler flags
 export RUST_BACKTRACE=full
 export LLVM_PROFILE_FILE="${directory_path}/%p-%m.profraw"
 export RUSTFLAGS="-Cinstrument-coverage"
-cargo build --workspace
 
 # run tests
 cargo test --workspace
