@@ -12,7 +12,8 @@ pub struct CreateUserCommandHandler {
 impl ICommandHandler<CreateUserCommand, Option<String>> for CreateUserCommandHandler {
     async fn handle(&self, cmd: CreateUserCommand) -> Option<String> {
         let user = User {
-            name: cmd.name.to_string(),
+            id: String::new(),
+            name: cmd.name,
             age: cmd.age,
         };
 

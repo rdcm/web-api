@@ -21,7 +21,7 @@ pub async fn get_user(
     path: Path<String>,
 ) -> HttpResponse {
     let query = GetUserQuery {
-        id: path.to_string(),
+        id: path.into_inner(),
     };
 
     let option = handler.handle(query).await;
@@ -30,7 +30,7 @@ pub async fn get_user(
         Some(user) => HttpResponse::Ok().json(UserResponse {
             name: user.name,
             age: user.age,
-            id: path.to_string(),
+            id: user.id,
         }),
         None => HttpResponse::BadRequest().json(ErrorResponse { code: 101 }),
     }
@@ -49,10 +49,12 @@ pub async fn get_user(
 #[post("/user")]
 pub async fn create_user(
     handler: Data<dyn ICommandHandler<CreateUserCommand, Option<String>>>,
-    request: Json<CreateUserRequest>,
+    json: Json<CreateUserRequest>,
 ) -> HttpResponse {
+    let request = json.into_inner();
+
     let command = CreateUserCommand {
-        name: request.name.to_string(),
+        name: request.name,
         age: request.age,
     };
 

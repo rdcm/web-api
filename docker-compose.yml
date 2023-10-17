@@ -16,5 +16,6 @@ services:
     environment:
       - API_HOST=0.0.0.0
       - API_PORT=8080
+      - DB_NAME=docker
+      - DB_URI=mongodb://mongo:27017
       - RUST_BACKTRACE=1
-      - DB_CONNECTION_STRING=mongodb://mongo:27017/test

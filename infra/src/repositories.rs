@@ -1,5 +1,6 @@
 use async_trait::async_trait;
-use mongodb::{bson, bson::doc, Collection};
+use mongodb::bson::oid::ObjectId;
+use mongodb::{bson::doc, Collection};
 
 use domain::queries::User;
 use domain_impl::ports::IUserRepository;
@@ -18,26 +19,24 @@ impl UserRepository {
 #[async_trait]
 impl IUserRepository for UserRepository {
     async fn create(&self, user: User) -> Option<String> {
-        let result = self.collection.insert_one(user, None).await;
+        let user_id = self
+            .collection
+            .insert_one(user, None)
+            .await
+            .ok()?
+            .inserted_id
+            .as_object_id()?
+            .to_string();
 
-        return match result {
-            Ok(insertion_result) => Some(
-                insertion_result
-                    .inserted_id
-                    .as_object_id()
-                    .unwrap()
-                    .to_string(),
-            ),
-            Err(_) => None,
-        };
+        Some(user_id)
     }
 
     async fn get(&self, id: String) -> Option<User> {
-        let user_id = bson::oid::ObjectId::parse_str(&id).ok()?;
-        return self
-            .collection
+        let user_id = ObjectId::parse_str(&id).ok()?;
+
+        self.collection
             .find_one(doc! { "_id": user_id }, None)
             .await
-            .ok()?;
+            .ok()?
     }
 }

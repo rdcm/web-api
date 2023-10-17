@@ -1,4 +1,4 @@
+#[path = "composition.rs"]
+pub mod composition;
 #[path = "conf.rs"]
 pub mod conf;
-#[path = "factory.rs"]
-pub mod factory;

@@ -1,7 +1,7 @@
 use actix_web::rt;
 use app::models::{CreateUserRequest, CreatedUserIdResponse, UserResponse};
+use host::composition::Composition;
 use host::conf::AppConf;
-use host::factory::create_server;
 use reqwest::StatusCode;
 
 #[derive(Clone)]
@@ -14,10 +14,11 @@ impl Sut {
         let conf = AppConf {
             api_host: "127.0.0.1".to_string(),
             api_port: 0,
-            connection_string: "mongodb://127.0.0.1/test".to_string(),
+            db_uri: "mongodb://127.0.0.1/test".to_string(),
+            db_name: "test".to_string(),
         };
 
-        let info = create_server(&conf).await.unwrap();
+        let info = Composition::new(&conf).await.unwrap();
         let base_url = format!("http://{}:{}", info.addrs[0].ip(), info.addrs[0].port());
 
         rt::spawn(info.server);
