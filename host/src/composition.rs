@@ -2,7 +2,7 @@ use actix_web::dev::Server;
 use actix_web::web::Data;
 use actix_web::{App, HttpServer};
 use mongodb::options::{ClientOptions, ServerApi, ServerApiVersion};
-use mongodb::{Client, Collection};
+use mongodb::Client;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use utoipa::OpenApi;
@@ -32,11 +32,20 @@ pub struct Composition {
 
 impl Composition {
     pub async fn new(conf: &AppConf) -> Result<Composition, std::io::Error> {
-        let user_repository_arc = Arc::new(create_user_repository(conf).await);
+        let mut client_options = ClientOptions::parse(&conf.db_uri).await.unwrap();
+        let server_api = ServerApi::builder().version(ServerApiVersion::V1).build();
+        client_options.server_api = Some(server_api);
+
+        let client = Client::with_options(client_options).unwrap();
+
+        let user_repository = UserRepository::new(client, &conf.db_name);
+        let user_repository_arc = Arc::new(user_repository);
+
         let command_handler: Arc<dyn ICommandHandler<CreateUserCommand, Option<String>>> =
             Arc::new(CreateUserCommandHandler {
                 repo: user_repository_arc.clone(),
             });
+
         let query_handler: Arc<dyn IQueryHandler<GetUserQuery, Option<User>>> =
             Arc::new(GetUserQueryHandler {
                 repo: user_repository_arc.clone(),
@@ -64,16 +73,4 @@ impl Composition {
 
         Ok(Self { server, addrs })
     }
-}
-
-async fn create_user_repository(conf: &AppConf) -> UserRepository {
-    let mut client_options = ClientOptions::parse(&conf.db_uri).await.unwrap();
-
-    let server_api = ServerApi::builder().version(ServerApiVersion::V1).build();
-    client_options.server_api = Some(server_api);
-
-    let client = Client::with_options(client_options).unwrap();
-
-    let collection: Collection<User> = client.database(&conf.db_name).collection("users");
-    UserRepository::new(collection)
 }

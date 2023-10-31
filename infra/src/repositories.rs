@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use mongodb::bson::oid::ObjectId;
-use mongodb::{bson::doc, Collection};
+use mongodb::{bson::doc, Client, Collection};
 
 use domain::queries::User;
 use domain_impl::ports::IUserRepository;
@@ -11,7 +11,8 @@ pub struct UserRepository {
 }
 
 impl UserRepository {
-    pub fn new(collection: Collection<User>) -> UserRepository {
+    pub fn new(client: Client, db_name: &str) -> UserRepository {
+        let collection: Collection<User> = client.database(db_name).collection("users");
         UserRepository { collection }
     }
 }
