@@ -1,16 +1,20 @@
 use actix_web::rt;
-use app::models::{CreateUserRequest, CreatedUserIdResponse, UserResponse};
+use app::models::{CreateUserRequest, CreatedUserIdResponse, TrackActivityRequest, UserResponse};
+use domain::events::ActivityEvent;
 use host::composition::Composition;
 use host::conf::AppConf;
+use messaging::fake_kafka::FakeKafkaFactory;
+use messaging::kafka::IKafkaFactory;
 use reqwest::StatusCode;
+use std::sync::Arc;
 
-#[derive(Clone)]
 pub struct Sut {
     base_url: String,
+    kafka_factory: Arc<dyn IKafkaFactory<ActivityEvent>>,
 }
 
 impl Sut {
-    pub async fn new() -> Sut {
+    pub async fn new() -> Self {
         let conf = AppConf {
             api_host: "127.0.0.1".to_string(),
             api_port: 0,
@@ -18,12 +22,20 @@ impl Sut {
             db_name: "test".to_string(),
         };
 
-        let info = Composition::new(&conf).await.unwrap();
+        let kafka_factory: Arc<dyn IKafkaFactory<ActivityEvent>> =
+            Arc::new(FakeKafkaFactory::new());
+        let info = Composition::new(&conf, kafka_factory.clone())
+            .await
+            .unwrap();
+
         let base_url = format!("http://{}:{}", info.addrs[0].ip(), info.addrs[0].port());
 
         rt::spawn(info.server);
 
-        Self { base_url }
+        Self {
+            base_url,
+            kafka_factory: kafka_factory.clone(),
+        }
     }
 
     pub async fn get_user(&self, id: String) -> Result<UserResponse, String> {
@@ -41,7 +53,11 @@ impl Sut {
         }
     }
 
-    pub async fn create_user(self, name: String, age: u8) -> Result<CreatedUserIdResponse, String> {
+    pub async fn create_user(
+        &self,
+        name: String,
+        age: u8,
+    ) -> Result<CreatedUserIdResponse, String> {
         let client = reqwest::Client::new();
         let uri = format!("{}/user", self.base_url);
 
@@ -59,5 +75,23 @@ impl Sut {
         } else {
             Err(response.text().await.unwrap())
         }
+    }
+
+    pub async fn track_activity(&self, activity: &TrackActivityRequest) -> Result<(), String> {
+        let client = reqwest::Client::new();
+        let uri = format!("{}/track_activity", self.base_url);
+
+        let response = client.post(uri).json(&activity).send().await.unwrap();
+
+        if response.status() == StatusCode::OK {
+            Ok(())
+        } else {
+            Err(response.text().await.unwrap())
+        }
+    }
+
+    pub fn get_activity_event(&self) -> ActivityEvent {
+        let consumer = self.kafka_factory.create_consumer();
+        consumer.poll()
     }
 }

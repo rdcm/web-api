@@ -17,3 +17,4 @@ app = { path = "../app" }
 domain = { path = "../domain" }
 domain_impl = { path = "../domain_impl" }
 infra = { path = "../infra" }
+messaging = { path = "../messaging" }

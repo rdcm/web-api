@@ -23,3 +23,11 @@ pub struct UserResponse {
 pub struct ErrorResponse {
     pub code: i32,
 }
+
+#[derive(Serialize, Deserialize, ToSchema)]
+pub enum TrackActivityRequest {
+    #[serde(rename = "click")]
+    Click { x: i32, y: i32 },
+    #[serde(rename = "open")]
+    Open { path: String },
+}

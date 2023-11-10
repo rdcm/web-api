@@ -8,3 +8,4 @@ async-trait = { version = "0.1.73", features = [] }
 mongodb = "2.7.0"
 domain = { path = "../domain" }
 domain_impl = { path = "../domain_impl" }
+messaging = { path = "../messaging" }

@@ -1,7 +1,11 @@
-use crate::models::{CreateUserRequest, CreatedUserIdResponse, ErrorResponse, UserResponse};
+use crate::models::TrackActivityRequest::{Click, Open};
+use crate::models::{
+    CreateUserRequest, CreatedUserIdResponse, ErrorResponse, TrackActivityRequest, UserResponse,
+};
 use actix_web::web::{Data, Json, Path};
 use actix_web::{get, post, HttpResponse};
 use domain::commands::{CreateUserCommand, ICommandHandler};
+use domain::events::{ActivityEvent, IActivityTracker};
 use domain::queries::{GetUserQuery, IQueryHandler, User};
 
 /// Get user
@@ -64,4 +68,28 @@ pub async fn create_user(
         Some(id) => HttpResponse::Created().json(CreatedUserIdResponse { id }),
         None => HttpResponse::BadRequest().json(ErrorResponse { code: 102 }),
     }
+}
+
+/// Track user activity
+///
+/// Track user activity
+#[utoipa::path(
+    request_body = TrackActivityRequest,
+    responses(
+        (status = 200, description = "Activity successfully tracked"),
+    )
+)]
+#[post("/track_activity")]
+pub async fn track_activity(
+    tracker: Data<dyn IActivityTracker>,
+    json: Json<TrackActivityRequest>,
+) -> HttpResponse {
+    let request = json.into_inner();
+
+    match request {
+        Click { x, y } => tracker.track(&ActivityEvent::Click { x, y }).await,
+        Open { path } => tracker.track(&ActivityEvent::Open { p: path }).await,
+    }
+
+    HttpResponse::Ok().json(())
 }

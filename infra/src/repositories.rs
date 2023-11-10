@@ -11,9 +11,9 @@ pub struct UserRepository {
 }
 
 impl UserRepository {
-    pub fn new(client: Client, db_name: &str) -> UserRepository {
+    pub fn new(client: Client, db_name: &str) -> Self {
         let collection: Collection<User> = client.database(db_name).collection("users");
-        UserRepository { collection }
+        Self { collection }
     }
 }
 

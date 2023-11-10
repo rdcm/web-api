@@ -6,6 +6,7 @@ Web api application prototype written in rust
 
 - Clean architecture design with CQRS pattern
 - Crud api endpoints with actix-web and mongodb driver
+- Kafka Consumer implemented with `rdkafka` 
 - Integration tests
 - Workspaces usage
 - OpenApi and Swagger-UI
@@ -15,6 +16,7 @@ Web api application prototype written in rust
 
 ## Structure
 
+- `acl` - anti corruption layer implemented as kafka consumer
 - `app` - application layer with endpoints
 - `domain` - business logic contracts (queries/commands interfaces)
 - `domain_impl` - implementation of buisiness logic contracts

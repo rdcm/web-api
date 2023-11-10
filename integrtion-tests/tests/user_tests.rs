@@ -1,6 +1,9 @@
 mod gen;
 mod sut;
 
+use app::models::TrackActivityRequest;
+use domain::events::ActivityEvent;
+
 use crate::gen::Gen;
 use crate::sut::Sut;
 
@@ -21,17 +24,43 @@ async fn user_created() {
 
     let sut = Sut::new().await;
 
-    let created_user = sut
-        .clone()
-        .create_user(name.to_string(), age)
-        .await
-        .unwrap();
+    let created_user = sut.create_user(name.to_string(), age).await.unwrap();
 
     let user_id = created_user.id;
 
-    let user = sut.clone().get_user(user_id.clone()).await.unwrap();
+    let user = sut.get_user(user_id.clone()).await.unwrap();
 
     assert_eq!(user.id, user_id);
     assert_eq!(user.name, name);
     assert_eq!(user.age, age);
+}
+
+#[actix_rt::test]
+async fn open_tracked() {
+    let path = Gen::random_string();
+    let sut = Sut::new().await;
+
+    sut.track_activity(&TrackActivityRequest::Open { path })
+        .await
+        .unwrap();
+
+    let event = sut.get_activity_event();
+
+    assert!(matches!(event, ActivityEvent::Open { p: path }));
+}
+
+#[actix_rt::test]
+async fn click_tracked() {
+    let x = Gen::random_i32();
+    let y = Gen::random_i32();
+    let path = Gen::random_string();
+    let sut = Sut::new().await;
+
+    sut.track_activity(&TrackActivityRequest::Click { x, y })
+        .await
+        .unwrap();
+
+    let event = sut.get_activity_event();
+
+    assert!(matches!(event, ActivityEvent::Click { x, y }));
 }

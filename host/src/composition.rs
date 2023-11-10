@@ -9,19 +9,27 @@ use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::conf::AppConf;
-use app::endpoints::{create_user, get_user};
+use app::endpoints::{create_user, get_user, track_activity};
 use app::models::*;
 use domain::commands::{CreateUserCommand, ICommandHandler};
+use domain::events::{ActivityEvent, IActivityTracker};
 use domain::queries::{GetUserQuery, IQueryHandler, User};
 use domain_impl::handlers::{CreateUserCommandHandler, GetUserQueryHandler};
 use infra::repositories::UserRepository;
+use infra::tracker::ActivityTracker;
+use messaging::kafka::IKafkaFactory;
 
 #[derive(OpenApi)]
 #[openapi(
-    paths(app::endpoints::create_user, app::endpoints::get_user),
+    paths(
+        app::endpoints::create_user,
+        app::endpoints::get_user,
+        app::endpoints::track_activity
+    ),
     components(
         schemas(CreateUserRequest, CreatedUserIdResponse, ErrorResponse),
-        schemas(UserResponse, ErrorResponse)
+        schemas(UserResponse, ErrorResponse),
+        schemas(TrackActivityRequest)
     )
 )]
 struct ApiDoc;
@@ -31,7 +39,13 @@ pub struct Composition {
 }
 
 impl Composition {
-    pub async fn new(conf: &AppConf) -> Result<Composition, std::io::Error> {
+    pub async fn new(
+        conf: &AppConf,
+        kafka_factory: Arc<dyn IKafkaFactory<ActivityEvent>>,
+    ) -> Result<Composition, std::io::Error> {
+        let producer = kafka_factory.create_producer();
+        let tracker: Arc<dyn IActivityTracker> = Arc::new(ActivityTracker::new(producer));
+
         let mut client_options = ClientOptions::parse(&conf.db_uri).await.unwrap();
         let server_api = ServerApi::builder().version(ServerApiVersion::V1).build();
         client_options.server_api = Some(server_api);
@@ -62,8 +76,10 @@ impl Composition {
                 )
                 .service(create_user)
                 .service(get_user)
+                .service(track_activity)
                 .app_data(Data::from(command_handler.clone()))
                 .app_data(Data::from(query_handler.clone()))
+                .app_data(Data::from(tracker.clone()))
         })
         .bind(&addr)
         .unwrap_or_else(|_| panic!("Failed to bind to the host: {}", &addr));

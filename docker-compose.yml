@@ -7,15 +7,82 @@ services:
     image: mongo:7.0
     ports:
       - "27017:27017"
+
+  acl:
+    build:
+      context: .
+      dockerfile: acl/Dockerfile
+    hostname: acl
+    container_name: acl
+    image: acl:latest
+    depends_on:
+      - kafka
+      - mongo
+      - zookeeper
+    environment:
+      - RUST_BACKTRACE=1
+      - KAFKA_BROKERS=kafka:29092
+      - KAFKA_TOPIC=messages
+      - KAFKA_GROUP_ID=dev
+
   web-api:
+    build:
+      context: .
+      dockerfile: host/Dockerfile
     hostname: web-api
     container_name: web-api
     image: web-api:latest
+    depends_on:
+      - kafka
+      - mongo
+      - zookeeper
     ports:
       - "8080:8080"
     environment:
       - API_HOST=0.0.0.0
       - API_PORT=8080
-      - DB_NAME=docker
+      - DB_NAME=dev
       - DB_URI=mongodb://mongo:27017
       - RUST_BACKTRACE=1
+      - KAFKA_BROKERS=kafka:29092
+      - KAFKA_TOPIC=messages
+      - KAFKA_GROUP_ID=dev
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.0.1
+    hostname: kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui
+    container_name: kafka-ui
+    ports:
+      - "8085:8080"
+    depends_on:
+      - kafka
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:29092

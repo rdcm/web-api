@@ -6,7 +6,7 @@ pub struct AppConf {
 }
 
 impl AppConf {
-    pub fn new() -> AppConf {
+    pub fn new() -> Self {
         Self {
             db_name: std::env::var("DB_NAME").unwrap_or_else(|_| "test".into()),
             api_host: std::env::var("API_HOST").unwrap_or_else(|_| "0.0.0.0".into()),
