@@ -6,7 +6,7 @@ members = [
     "domain_impl",
     "host",
     "infra",
-    "integrtion-tests",
+    "integration-tests",
     "acl"
 ]
 

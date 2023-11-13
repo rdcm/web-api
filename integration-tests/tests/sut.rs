@@ -44,12 +44,10 @@ impl Sut {
 
         let response = client.get(uri).send().await.unwrap();
 
-        if response.status() == StatusCode::OK {
-            let user: UserResponse = response.json().await.unwrap();
-
-            Ok(user)
-        } else {
-            Err(response.text().await.unwrap())
+        match response.status() {
+            StatusCode::OK => Ok(response.json().await.unwrap()),
+            StatusCode::BAD_REQUEST => Err(response.text().await.unwrap()),
+            code => Err(format!("unexpected status code {}", code))
         }
     }
 
@@ -68,12 +66,9 @@ impl Sut {
             .await
             .unwrap();
 
-        if response.status() == StatusCode::CREATED {
-            let user: CreatedUserIdResponse = response.json().await.unwrap();
-
-            Ok(user)
-        } else {
-            Err(response.text().await.unwrap())
+        match response.status() {
+            StatusCode::CREATED => Ok(response.json().await.unwrap()),
+            code => Err(format!("unexpected status code {}", code))
         }
     }
 
@@ -83,10 +78,9 @@ impl Sut {
 
         let response = client.post(uri).json(&activity).send().await.unwrap();
 
-        if response.status() == StatusCode::OK {
-            Ok(())
-        } else {
-            Err(response.text().await.unwrap())
+        match response.status() {
+            StatusCode::OK => Ok(()),
+            code => Err(format!("unexpected status code {}", code))
         }
     }
 

@@ -20,7 +20,7 @@ cargo test --workspace
 find . -path "*/${timestamp}/*" -name '*.profraw' -exec mv {} "./${directory_path}" \;
 
 # generate report
-grcov "${directory_path}" --binary-path target/debug -s . -o "${directory_path}" --ignore "target/debug/*" --ignore "integrtion-tests/*" --output-types html
+grcov "${directory_path}" --binary-path target/debug -s . -o "${directory_path}" --ignore "target/debug/*" --ignore "integration-tests/*" --output-types html
 
 # open report
 open "./${directory_path}/html/index.html"
