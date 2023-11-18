@@ -9,8 +9,8 @@ use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
 use crate::conf::AppConf;
-use app::endpoints::{create_user, get_user, track_activity};
-use app::models::*;
+use api::endpoints::{create_user, get_user, track_activity};
+use api::models::*;
 use domain::commands::{CreateUserCommand, ICommandHandler};
 use domain::events::{ActivityEvent, IActivityTracker};
 use domain::queries::{GetUserQuery, IQueryHandler, User};
@@ -22,9 +22,9 @@ use messaging::kafka::IKafkaFactory;
 #[derive(OpenApi)]
 #[openapi(
     paths(
-        app::endpoints::create_user,
-        app::endpoints::get_user,
-        app::endpoints::track_activity
+        api::endpoints::create_user,
+        api::endpoints::get_user,
+        api::endpoints::track_activity
     ),
     components(
         schemas(CreateUserRequest, CreatedUserIdResponse, ErrorResponse),

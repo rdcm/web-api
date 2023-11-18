@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.mongodb.label }}-deployment
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.mongodb.label }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.mongodb.label }}
+    spec:
+      containers:
+      - name: {{ .Values.mongodb.image.name }}
+        image: "{{ .Values.mongodb.image.name }}:{{ .Values.mongodb.image.tag }}"
+        resources:
+          limits:
+            memory: {{ .Values.mongodb.resources.limits.memory }}
+            cpu: {{ .Values.mongodb.resources.limits.cpu }}
+        ports:
+        - containerPort: {{ .Values.mongodb.port }}
+
+

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.kafka.label }}-service
+spec:
+  selector:
+    app: {{ .Values.kafka.label }}
+  ports:
+  - port: {{ .Values.kafka.port }}
+    targetPort: {{ .Values.kafka.port }}

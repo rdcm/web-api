@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.kafka.label }}-deployment
+spec:
+  replicas: {{ .Values.kafka.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.kafka.label }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.kafka.label }}
+    spec:
+      containers:
+      - env:
+        - name: KAFKA_BROKER_ID
+          value: "{{ .Values.kafka.variables.brokerId }}"
+        - name: KAFKA_ZOOKEEPER_CONNECT
+          value: {{ .Values.kafka.variables.zookeeperConnect }}
+        - name: KAFKA_LISTENERS
+          value: {{ .Values.kafka.variables.listeners }}
+        - name: KAFKA_ADVERTISED_LISTENERS
+          value: {{ .Values.kafka.variables.advertisedListeners }}
+        image: {{ .Values.kafka.image.name }}
+        imagePullPolicy: {{ .Values.kafka.pullPolicy }}
+        name: {{ .Values.kafka.label }}
+        resources:
+          limits:
+            memory: {{ .Values.kafka.resources.limits.memory }}
+            cpu: {{ .Values.kafka.resources.limits.cpu }}
+        ports:
+        - containerPort: {{ .Values.kafka.port }}

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.zookeeper.label }}-deployment
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.zookeeper.label }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.zookeeper.label }}
+    spec:
+      containers:
+        - image: {{ .Values.zookeeper.image.name }}
+          imagePullPolicy: {{ .Values.zookeeper.pullPolicy }}
+          name: {{ .Values.zookeeper.label }}
+          ports:
+            - containerPort: {{ .Values.zookeeper.port }}
+          resources:
+            limits:
+              memory: {{ .Values.zookeeper.resources.limits.memory }}
+              cpu: {{ .Values.zookeeper.resources.limits.cpu }}

@@ -1,5 +1,5 @@
 use actix_web::rt;
-use app::models::{CreateUserRequest, CreatedUserIdResponse, TrackActivityRequest, UserResponse};
+use api::models::{CreateUserRequest, CreatedUserIdResponse, TrackActivityRequest, UserResponse};
 use domain::events::ActivityEvent;
 use host::composition::Composition;
 use host::conf::AppConf;
@@ -47,7 +47,7 @@ impl Sut {
         match response.status() {
             StatusCode::OK => Ok(response.json().await.unwrap()),
             StatusCode::BAD_REQUEST => Err(response.text().await.unwrap()),
-            code => Err(format!("unexpected status code {}", code))
+            code => Err(format!("unexpected status code {}", code)),
         }
     }
 
@@ -68,7 +68,7 @@ impl Sut {
 
         match response.status() {
             StatusCode::CREATED => Ok(response.json().await.unwrap()),
-            code => Err(format!("unexpected status code {}", code))
+            code => Err(format!("unexpected status code {}", code)),
         }
     }
 
@@ -80,7 +80,7 @@ impl Sut {
 
         match response.status() {
             StatusCode::OK => Ok(()),
-            code => Err(format!("unexpected status code {}", code))
+            code => Err(format!("unexpected status code {}", code)),
         }
     }
 

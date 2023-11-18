@@ -4,7 +4,7 @@ version = "0.0.1"
 edition = "2021"
 
 [dependencies]
-app = { path = "../app" }
+api = { path = "../api" }
 domain = { path = "../domain" }
 domain_impl = { path = "../domain_impl" }
 infra = { path = "../infra" }

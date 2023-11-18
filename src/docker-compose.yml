@@ -1,14 +1,8 @@
 version: '3.8'
 
 services:
-  mongo:
-    hostname: mongo
-    container_name: mongo
-    image: mongo:7.0
-    ports:
-      - "27017:27017"
-
   acl:
+    profiles: ["dev-build"]
     build:
       context: .
       dockerfile: acl/Dockerfile
@@ -25,13 +19,14 @@ services:
       - KAFKA_TOPIC=messages
       - KAFKA_GROUP_ID=dev
 
-  web-api:
+  api:
+    profiles: ["dev-build"]
     build:
       context: .
       dockerfile: host/Dockerfile
-    hostname: web-api
-    container_name: web-api
-    image: web-api:latest
+    hostname: api
+    container_name: api
+    image: api:latest
     depends_on:
       - kafka
       - mongo
@@ -47,6 +42,13 @@ services:
       - KAFKA_BROKERS=kafka:29092
       - KAFKA_TOPIC=messages
       - KAFKA_GROUP_ID=dev
+
+  mongo:
+    hostname: mongo
+    container_name: mongo
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.0.1

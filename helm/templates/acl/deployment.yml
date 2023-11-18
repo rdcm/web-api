@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.acl.label }}-deployment
+spec:
+  replicas: {{ .Values.acl.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.acl.label }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.acl.label }}
+    spec:
+      containers:
+      - name: {{ .Values.acl.image.name }}
+        image: "{{ .Values.acl.image.name }}:{{ .Values.acl.image.tag }}"
+        env:
+        - name: KAFKA_BROKERS
+          value: {{ .Values.acl.kafka.brokers }}
+        - name: KAFKA_TOPIC
+          value: {{ .Values.acl.kafka.topic }}
+        - name: KAFKA_GROUP_ID
+          value: {{ .Values.acl.kafka.group }}
+        imagePullPolicy: {{ .Values.acl.pullPolicy }}
+        resources:
+          limits:
+            memory: {{ .Values.acl.resources.limits.memory }}
+            cpu: {{ .Values.acl.resources.limits.cpu }}
+

@@ -1,0 +1,80 @@
+mongodb:
+  label: mongodb
+  replicas: 1
+  port: 27017
+  image:
+    name: mongo
+    tag: latest 
+  resources:
+    limits:
+      memory: "128Mi"
+      cpu: "500m"
+
+kafka:
+  label: kafka
+  replicas: 1
+  port: 9092
+  image:
+    name: wurstmeister/kafka
+    tag: latest 
+  pullPolicy: IfNotPresent
+  resources:
+    limits:
+      memory: "512Mi"
+      cpu: "500m" 
+  variables:
+    listeners: PLAINTEXT://:9092
+    zookeeperConnect: zookeeper-service:2181
+    advertisedListeners: PLAINTEXT://kafka-service:9092
+    brokerId: "1"
+
+zookeeper:
+  label: zookeeper
+  replicas: 1
+  port: 2181
+  image:
+    name: wurstmeister/zookeeper
+    tag: latest 
+  pullPolicy: IfNotPresent
+  resources:
+    limits:
+      memory: "128Mi"
+      cpu: "500m" 
+
+acl:
+  label: acl
+  replicas: 5
+  kafka:
+    brokers: kafka-service:9092
+    topic: messages
+    group: acl
+  image:
+    name: acl
+    tag: latest
+  pullPolicy: Never
+  resources:
+    limits:
+      memory: "128Mi"
+      cpu: "500m" 
+
+api:
+  label: api
+  replicas: 1
+  port: 8080
+  image:
+    name: api
+    tag: latest 
+  pullPolicy: Never
+  resources:
+    limits:
+      memory: "128Mi"
+      cpu: "500m"
+  ingress:
+    host: foomyapp.com
+    ingressClassName: nginx            
+  kafka:
+    brokers: kafka-service:9092
+    topic: messages
+    group: acl
+  mongodb:
+    uri: mongodb://mongodb-service:27017/

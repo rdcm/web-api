@@ -1,7 +1,7 @@
 mod gen;
 mod sut;
 
-use app::models::TrackActivityRequest;
+use api::models::TrackActivityRequest;
 use domain::events::ActivityEvent;
 
 use crate::gen::Gen;

@@ -1,4 +1,4 @@
-use app::models::TrackActivityRequest;
+use api::models::TrackActivityRequest;
 use rand::Rng;
 use uuid::Uuid;
 
