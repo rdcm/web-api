@@ -20,5 +20,11 @@ spec:
             cpu: {{ .Values.mongodb.resources.limits.cpu }}
         ports:
         - containerPort: {{ .Values.mongodb.port }}
-
+        volumeMounts:
+          - mountPath: /data/db
+            name: {{ .Values.mongodb.label }}
+      volumes:
+      - name: {{ .Values.mongodb.label }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.mongodb.label }}
 

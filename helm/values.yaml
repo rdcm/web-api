@@ -7,8 +7,10 @@ mongodb:
     tag: latest 
   resources:
     limits:
-      memory: "128Mi"
+      memory: "512Mi"
       cpu: "500m"
+  volume:
+    capacity: 1000Mi
 
 kafka:
   label: kafka
