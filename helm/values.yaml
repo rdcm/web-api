@@ -1,6 +1,8 @@
 mongodb:
   label: mongodb
-  replicas: 1
+  replicaSetName: web-api
+  pvc: pvc
+  replicas: 3
   port: 27017
   image:
     name: mongo
@@ -10,7 +12,7 @@ mongodb:
       memory: "512Mi"
       cpu: "500m"
   volume:
-    capacity: 1000Mi
+    capacity: 1Gi
 
 kafka:
   label: kafka

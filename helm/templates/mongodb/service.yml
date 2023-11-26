@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: {{ .Values.mongodb.label }}-service
 spec:
+  clusterIP: None # headless service
   selector:
     app: {{ .Values.mongodb.label }}
   ports:

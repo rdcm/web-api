@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.mongodb.label }}
+spec:
+  replicas: {{ .Values.mongodb.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.mongodb.label }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.mongodb.label }}
+    spec:
+      containers:
+      - name: {{ .Values.mongodb.image.name }}
+        image: "{{ .Values.mongodb.image.name }}:{{ .Values.mongodb.image.tag }}"
+        command:
+          - "mongod"
+          - "--bind_ip"
+          - "0.0.0.0"
+          - "--replSet"
+          - {{ .Values.mongodb.replicaSetName }}
+        readinessProbe:
+          exec:
+            command: >
+              sh -c "mongosh rs.initiate({ _id: {{ .Values.mongodb.replicaSetName }}, version: 1, members: [ { _id: 0, host: "mongodb-0.mongodb-service.default.svc.cluster.local:27017" }, { _id: 1, host: "mongodb-1.mongodb-service.default.svc.cluster.local:27017" }, { _id: 2, host: "mongodb-2.mongodb-service.default.svc.cluster.local:27017" } ]});
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        resources:
+          limits:
+            memory: {{ .Values.mongodb.resources.limits.memory }}
+            cpu: {{ .Values.mongodb.resources.limits.cpu }}
+        ports:
+        - containerPort: {{ .Values.mongodb.port }}
+        volumeMounts:
+          - mountPath: /data/db
+            name: {{ .Values.mongodb.pvc }}
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ .Values.mongodb.pvc }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.mongodb.volume.capacity }}
