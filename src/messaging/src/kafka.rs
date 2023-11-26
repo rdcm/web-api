@@ -61,7 +61,7 @@ pub trait IKafkaProducer<T>: Sync + Send
 where
     T: Serialize + Send + Sync,
 {
-    async fn produce(&self, message: &T) -> Option<()>;
+    async fn produce(&self, key: &str, message: &T) -> Option<()>;
 }
 
 #[async_trait]
@@ -91,11 +91,9 @@ impl KafkaProducer {
 
 #[async_trait]
 impl<T: Serialize + Send + Sync> IKafkaProducer<T> for KafkaProducer {
-    async fn produce(&self, message: &T) -> Option<()> {
-        let mut buffer: Vec<u8> = Vec::new();
-        serde_json::to_writer(&mut buffer, message).ok()?;
-
-        let record = FutureRecord::to(&self.topic).key("").payload(&buffer);
+    async fn produce(&self, key: &str, message: &T) -> Option<()> {
+        let json = serde_json::to_string(&message).ok()?;
+        let record = FutureRecord::to(&self.topic).key(key).payload(&json);
 
         self.producer
             .send(record, Duration::from_secs(0))
@@ -117,6 +115,7 @@ impl KafkaConsumer {
         let consumer: StreamConsumer<CustomContext> = ClientConfig::new()
             .set("group.id", config.group_id)
             .set("bootstrap.servers", config.brokers)
+            .set("auto.offset.reset", "earliest")
             .set("enable.partition.eof", "false")
             .set("session.timeout.ms", "6000")
             .set("enable.auto.commit", "true")

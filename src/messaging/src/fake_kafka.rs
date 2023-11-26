@@ -42,7 +42,7 @@ impl<T: for<'a> Deserialize<'a> + Serialize + Send + Sync + Debug> IKafkaFactory
 
 #[async_trait]
 impl<T: Serialize + Send + Sync> IKafkaProducer<T> for FakeKafkaProducer {
-    async fn produce(&self, message: &T) -> Option<()> {
+    async fn produce(&self, _key: &str, message: &T) -> Option<()> {
         let json = serde_json::to_string(message).ok()?;
         self.sender.send(json).ok()?;
         Some(())

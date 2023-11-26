@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.api.label }}-deployment
+  annotations:
+    "helm.sh/hook-weight": "{{ .Values.api.weight }}"
 spec:
   selector:
     matchLabels:
@@ -14,6 +16,12 @@ spec:
       containers:
       - name: {{ .Values.api.image.name }}
         image: "{{ .Values.api.image.name }}:{{ .Values.api.image.tag }}"
+        readinessProbe:
+          exec:
+            command: 
+            - sh
+            - -c
+            - "nc -z kafka-service 9092 || exit -1"
         env:
         - name: DB_URI
           value: {{ .Values.api.mongodb.uri }}

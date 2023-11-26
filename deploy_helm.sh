@@ -1,3 +1,3 @@
 #!/bin/bash
 
-helm install web-api-dev helm
+helm upgrade --install --atomic --timeout 300s --wait web-api-dev helm

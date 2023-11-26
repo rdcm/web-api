@@ -3,7 +3,7 @@ use serde_derive::{Deserialize, Serialize};
 
 #[async_trait]
 pub trait IActivityTracker: Send + Sync {
-    async fn track(&self, activity: &ActivityEvent);
+    async fn track(&self, activity: &ActivityEvent) -> Option<()>;
 }
 #[derive(Serialize, Deserialize, Debug)]
 pub enum ActivityEvent {
