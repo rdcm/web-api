@@ -1099,6 +1099,7 @@ dependencies = [
  "domain_impl",
  "messaging",
  "mongodb",
+ "uuid",
 ]
 
 [[package]]

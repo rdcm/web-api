@@ -86,10 +86,13 @@ pub async fn track_activity(
 ) -> HttpResponse {
     let request = json.into_inner();
 
-    match request {
+    let result = match request {
         Click { x, y } => tracker.track(&ActivityEvent::Click { x, y }).await,
         Open { path } => tracker.track(&ActivityEvent::Open { p: path }).await,
-    }
+    };
 
-    HttpResponse::Ok().json(())
+    match result {
+        Some(_) => HttpResponse::Ok().json(()),
+        None => HttpResponse::BadRequest().json(ErrorResponse { code: 103 })
+    }
 }

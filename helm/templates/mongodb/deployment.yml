@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.mongodb.label }}-deployment
+  annotations:
+    "helm.sh/hook-weight": "{{ .Values.mongodb.weight }}"
 spec:
   selector:
     matchLabels:

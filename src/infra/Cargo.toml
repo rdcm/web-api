@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 async-trait = { version = "0.1.73", features = [] }
 mongodb = "2.7.0"
+uuid = { version = "1.4.1", features = ["serde", "v4"] }
 domain = { path = "../domain" }
 domain_impl = { path = "../domain_impl" }
 messaging = { path = "../messaging" }

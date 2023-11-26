@@ -1,6 +1,7 @@
 mongodb:
   label: mongodb
   replicas: 1
+  weight: 2
   port: 27017
   image:
     name: mongo
@@ -15,28 +16,34 @@ mongodb:
 kafka:
   label: kafka
   replicas: 1
+  weight: 1
   port: 9092
   image:
-    name: wurstmeister/kafka
-    tag: latest 
+    name: confluentinc/cp-kafka
+    tag: 7.0.1
   pullPolicy: IfNotPresent
   resources:
     limits:
       memory: "512Mi"
       cpu: "500m" 
   variables:
-    listeners: PLAINTEXT://:9092
+    brokerId: 1
     zookeeperConnect: zookeeper-service:2181
+    securityProtocolMap: PLAINTEXT:PLAINTEXT
     advertisedListeners: PLAINTEXT://kafka-service:9092
-    brokerId: "1"
+    listeners: PLAINTEXT://:9092
+    numPartitions: &patitions 2
+    replicationFactor: 1
 
 zookeeper:
   label: zookeeper
   replicas: 1
+  weight: 0
   port: 2181
+  tickTime: 2000
   image:
-    name: wurstmeister/zookeeper
-    tag: latest 
+    name: confluentinc/cp-zookeeper
+    tag: 7.0.1
   pullPolicy: IfNotPresent
   resources:
     limits:
@@ -45,7 +52,8 @@ zookeeper:
 
 acl:
   label: acl
-  replicas: 5
+  replicas: *patitions
+  weight: 3
   kafka:
     brokers: kafka-service:9092
     topic: messages
@@ -62,6 +70,7 @@ acl:
 api:
   label: api
   replicas: 1
+  weight: 4
   port: 8080
   image:
     name: api
