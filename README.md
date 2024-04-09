@@ -24,28 +24,30 @@ Web api application prototype written in rust
 - `host` - host process for application with composition root
 - `integration-tests` - integration tests for application
 
-## Dev environment
-
-- `docker` v24.0.6
-- `docker-compose` v2.23.0
-- `kubernetes` v1.28.2
-- `rustc` 1.72.1
-- `cargo` 1.72.1
-
-For deploing with helm `/etc/hosts` require `127.0.0.1 dev-wep-api.com` entry for access to application in browser.
-
 ## Up & Running
 
-From src folder:
-- `docker-compose up -d` - up dev environment
-- `run.sh` - run api application for local debuging
-- `build.sh` - build all workspaces
-- `build_images.sh` - build `acl` and `api` dev images
-- `docker-compose --profile dev-build up -d` - up `acl` and `api` dev images with compose
-- `format.sh` - format code
-- `analyze.sh` - static analysis
-- `run_tests.sh` - build and run tests
-
 From root folder:
-- `generate_cert.sh` - generate self signed cert and create kubernetes secret
-- `deploy_helm.sh` - deploy images to local kubernetes cluster
+- `make setup` - setup environment (brew, docker, helm, rust)
+- `make deploy` - deploy to kubernetes with helm (you should enable k8s support manually)
+- `make delete` - delete helm chart
+
+From src folder:
+- `make up flag=e` - up environment only
+- `make up flag=a` - up all include applications
+- `make down flag=e` - down environment only
+- `make down flag=a` - down all include applications
+- `make build flag=l` - build local binaries
+- `make build flag=i` - build apps images
+- `make lint` - run clippy for static analysis
+- `make format` - run fmt for code formatting
+- `make tests` - run tests
+- `make run` - run local build
+
+## Web interfaces:
+
+K8s:  
+`swagger`  - https://dev-wep-api.com/swagger-ui/  
+
+Docker-compose:  
+`swagger`  - http://localhost:8080/swagger-ui/  
+`kafka-ui` - http://localhost:8085/  

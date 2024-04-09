@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# install tools
-cargo install grcov
-rustup component add llvm-tools-preview
-
 # set coverage directory path
 timestamp="$(date '+%Y-%m-%d_%H-%M-%S')"
 directory_path="target/coverage/${timestamp}"

@@ -93,6 +93,6 @@ pub async fn track_activity(
 
     match result {
         Some(_) => HttpResponse::Ok().json(()),
-        None => HttpResponse::BadRequest().json(ErrorResponse { code: 103 })
+        None => HttpResponse::BadRequest().json(ErrorResponse { code: 103 }),
     }
 }
