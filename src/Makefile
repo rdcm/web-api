@@ -1,29 +1,20 @@
-up:
-ifeq ($(flag),e)
-	docker-compose up -d
-else ifeq ($(flag),a)
-	docker-compose --profile dev-build up -d
-else
-	$(warning "pass flag=e (environment only) or flag=a (all include applications)")
-endif
+docker-up-env:
+	docker compose up -d
 
-down:
-ifeq ($(flag),e)
-	docker-compose down
-else ifeq ($(flag),a)
-	docker-compose --profile dev-build down
-else
-	$(warning "pass flag=e (environment only) or flag=a (all include applications)")
-endif
+docker-up-apps:
+	docker compose --profile dev-build up -d
+
+docker-down-env:
+	docker compose down
+
+docker-down-apps:
+	docker compose --profile dev-build down
 
 build:
-ifeq ($(flag),l)
 	cargo build --workspace
-else ifeq ($(flag),i)
-	docker-compose --profile dev-build build
-else
-	$(warning "pass flag=l (for build local) or flag=i (for build images)")
-endif
+
+docker-build-apps:
+	docker compose --profile dev-build build
 
 lint:
 	cargo clippy

@@ -22,7 +22,7 @@ impl IUserRepository for UserRepository {
     async fn create(&self, user: User) -> Option<String> {
         let user_id = self
             .collection
-            .insert_one(user, None)
+            .insert_one(user)
             .await
             .ok()?
             .inserted_id
@@ -36,7 +36,7 @@ impl IUserRepository for UserRepository {
         let user_id = ObjectId::parse_str(&id).ok()?;
 
         self.collection
-            .find_one(doc! { "_id": user_id }, None)
+            .find_one(doc! { "_id": user_id })
             .await
             .ok()?
     }

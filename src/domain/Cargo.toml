@@ -4,8 +4,8 @@ version = "0.0.1"
 edition = "2021"
 
 [dependencies]
-async-trait = { version = "0.1.73", features = [] }
-serde = "1.0.188"
-serde_derive = "1.0.188"
-bson = "2.7.0"
+async-trait = { workspace = true }
+serde = { workspace = true }
+serde_derive = { workspace = true }
+bson = { workspace = true }
 

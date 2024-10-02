@@ -4,9 +4,9 @@ version = "0.0.1"
 edition = "2021"
 
 [dependencies]
-actix-web = "4.4.0"
-serde = "1.0.188"
-serde_derive = "1.0.188"
+actix-web = { workspace = true }
+serde = { workspace = true }
+serde_derive = { workspace = true }
+utoipa = { workspace = true }
 domain = { path = "../domain" }
 messaging = { path = "../messaging" }
-utoipa = { version = "4", features = ["actix_extras"] }

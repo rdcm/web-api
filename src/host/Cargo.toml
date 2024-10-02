@@ -4,14 +4,14 @@ version = "0.0.1"
 edition = "2021"
 
 [dependencies]
-actix-web = "4.4.0"
-env_logger = "0.10.0"
-mongodb = "2.7.0"
-serde = "1.0.188"
-serde_derive = "1.0.188"
-async-trait = "0.1.73"
-utoipa = { version = "4", features = ["actix_extras"] }
-utoipa-swagger-ui = { version = "4", features = ["actix-web"] }
+actix-web = { workspace = true }
+env_logger = { workspace = true }
+mongodb = { workspace = true }
+serde = { workspace = true }
+serde_derive = { workspace = true }
+async-trait = { workspace = true }
+utoipa = { workspace = true }
+utoipa-swagger-ui = { workspace = true }
 
 api = { path = "../api" }
 domain = { path = "../domain" }

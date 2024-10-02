@@ -1,5 +1,5 @@
 # build image
-FROM rust:1.73.0-slim-buster as build
+FROM rust:1.79.0-slim-buster as build
 WORKDIR /web-api
 COPY . .
 

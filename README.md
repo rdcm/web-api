@@ -32,12 +32,12 @@ From root folder:
 - `make delete` - delete helm chart
 
 From src folder:
-- `make up flag=e` - up environment only
-- `make up flag=a` - up all include applications
-- `make down flag=e` - down environment only
-- `make down flag=a` - down all include applications
-- `make build flag=l` - build local binaries
-- `make build flag=i` - build apps images
+- `make docker-up-env` - up environment only
+- `make docker-up-apps` - up all include applications
+- `make docker-down-env` - down environment only
+- `make docker-down-apps` - down all include applications
+- `make docker-build-apps` - build apps images
+- `make build` - build local binaries
 - `make lint` - run clippy for static analysis
 - `make format` - run fmt for code formatting
 - `make tests` - run tests
